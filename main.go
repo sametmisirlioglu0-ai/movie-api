@@ -1,7 +1,13 @@
 package main
 
 import (
+	"context"
+	"log"
+	"os"
+	"os/signal"
 	"strconv"
+	"syscall"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -52,7 +58,27 @@ func main() {
 		app.Delete("/movie/:id", deleteMovie)
 		app.Patch("/movie/:id", updateMovie)
 	})
-	app.Listen(":8080")
+	go func() {
+		if err := app.Listen(":8080"); err != nil {
+			log.Println("Server hata:", err)
+		}
+	}()
+
+	// Sinyalleri dinle
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("Sunucu kapatılıyor...")
+
+	// Graceful shutdown
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := app.ShutdownWithContext(ctx); err != nil {
+		log.Fatalf("Sunucu kapatılamadı: %v", err)
+	}
+
+	log.Println("Sunucu kapatıldı")
 }
 
 func getMovies(c *fiber.Ctx) error {
