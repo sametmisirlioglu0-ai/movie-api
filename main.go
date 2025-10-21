@@ -64,13 +64,11 @@ func main() {
 		}
 	}()
 
-	// Sinyalleri dinle
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Println("Sunucu kapatılıyor...")
 
-	// Graceful shutdown
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
