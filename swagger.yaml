@@ -1,0 +1,155 @@
+definitions:
+  main.Movies:
+    properties:
+      id:
+        type: integer
+      name:
+        maxLength: 100
+        type: string
+      point:
+        maximum: 100
+        minimum: 0
+        type: integer
+      year:
+        type: integer
+    required:
+    - name
+    - point
+    - year
+    type: object
+info:
+  contact: {}
+paths:
+  /movie:
+    post:
+      consumes:
+      - application/json
+      description: Gönderilen veriyle yeni film oluşturur
+      parameters:
+      - description: Film nesnesi
+        in: body
+        name: movie
+        required: true
+        schema:
+          $ref: '#/definitions/main.Movies'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/main.Movies'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Yeni film ekle
+      tags:
+      - movies
+  /movie/{id}:
+    delete:
+      description: Verilen ID'li filmi siler
+      parameters:
+      - description: Film ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "204":
+          description: No Content
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Film sil
+      tags:
+      - movies
+    get:
+      description: Verilen ID'li filmi döner
+      parameters:
+      - description: Film ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Movies'
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: ID'ye göre film getir
+      tags:
+      - movies
+    patch:
+      consumes:
+      - application/json
+      description: Verilen ID'li filmi günceller
+      parameters:
+      - description: Film ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Güncellenmiş film
+        in: body
+        name: movie
+        required: true
+        schema:
+          $ref: '#/definitions/main.Movies'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.Movies'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Film güncelle
+      tags:
+      - movies
+  /movies:
+    get:
+      description: Veritabanındaki tüm filmleri listeler
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/main.Movies'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Tüm filmleri getir
+      tags:
+      - movies
+swagger: "2.0"
